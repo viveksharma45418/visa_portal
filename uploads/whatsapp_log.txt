@@ -1,0 +1,21 @@
+================================================================================
+Timestamp: 2026-07-16 12:43:34
+Recipient Phone: +918091742704 (vivek sharma)
+Provider: log
+Status: SUCCESS
+Gateway Debug: Logged to local mock file.
+Message Content:
+-------------------------------
+Dear vivek sharma,
+
+Your Study Visa Application status has been updated. Details:
+
+📂 Application ID: VV-2026-0002
+📍 Current Status: Documents Requested
+
+To view details, visit: http://localhost/visa_portal/
+
+— Visa Vista Global Support
+-------------------------------
+================================================================================
+
