@@ -48,6 +48,10 @@
      HERO SECTION
      ============================================================ -->
 <section class="hero-section">
+  <!-- Dynamic background glow orbs -->
+  <div class="orb-glow" style="width: 350px; height: 350px; background: var(--gold); top: -100px; right: -50px;"></div>
+  <div class="orb-glow" style="width: 250px; height: 250px; background: #3B82F6; bottom: -50px; left: -50px; animation-delay: 2.5s;"></div>
+  
   <div class="container">
     <div class="row align-items-center gy-4">
       <div class="col-lg-7">

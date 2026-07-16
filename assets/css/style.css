@@ -1226,3 +1226,129 @@ textarea.form-control { resize: vertical; min-height: 100px; }
   .form-card-body { padding: 18px; }
   .admin-content { padding: 16px 0; }
 }
+
+/* ================================================================
+   PREMIUM MICRO-ANIMATIONS & INTERACTIVE INTERACTIONS
+   ================================================================ */
+
+/* Floating Orbs on Hero and Login Backgrounds */
+.orb-glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.12;
+  pointer-events: none;
+  z-index: 0;
+  animation: floatOrb 12s ease-in-out infinite alternate;
+}
+@keyframes floatOrb {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(30px, -30px) scale(1.15); }
+}
+
+/* Interactive Form Cards Focus and Hover Effects */
+.form-card {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.form-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(13,27,62,0.08);
+}
+.form-card:focus-within {
+  border-color: var(--gold-light);
+  box-shadow: 0 16px 40px rgba(212,175,55,0.06);
+  transform: translateY(-3px);
+}
+
+/* Hover effects for stats row */
+.stat-row {
+  transition: all 0.3s ease;
+}
+.stat-row:hover {
+  background: rgba(255, 255, 255, 0.03);
+  padding-left: 6px;
+}
+.stat-row:hover .stat-icon {
+  transform: scale(1.1) rotate(4deg);
+  background: linear-gradient(135deg, rgba(212,175,55,0.35), rgba(212,175,55,0.1));
+  box-shadow: 0 0 14px rgba(212,175,55,0.4);
+}
+.stat-icon {
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Document Upload Cards Pop animations */
+.upload-card {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.upload-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(13,27,62,0.08);
+  border-color: var(--primary-light);
+}
+.upload-card.uploaded {
+  animation: uploadSuccessPop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+@keyframes uploadSuccessPop {
+  0% { transform: scale(0.96); opacity: 0.8; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Pulse Glowing Active Step indicator */
+.step-item.active .step-circle {
+  animation: activePulse 2s infinite;
+}
+@keyframes activePulse {
+  0% { box-shadow: 0 0 0 0 rgba(13,27,62,0.35); }
+  70% { box-shadow: 0 0 0 12px rgba(13,27,62,0); }
+  100% { box-shadow: 0 0 0 0 rgba(13,27,62,0); }
+}
+
+/* Stepper connectors completion transition */
+.step-connector {
+  transition: background 0.5s ease-in-out;
+}
+
+/* Smooth step pane slide transitions */
+.step-content {
+  display: none;
+  opacity: 0;
+  transform: translateY(20px);
+}
+.step-content.active {
+  display: block;
+  animation: smoothStepIn 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+@keyframes smoothStepIn {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Button Shiny Hover Reflection Glow */
+.btn-next-step, .btn-submit-app, .btn-dashboard {
+  position: relative;
+  overflow: hidden;
+}
+.btn-next-step::after, .btn-submit-app::after, .btn-dashboard::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -120%;
+  width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+  transform: skewX(-25deg);
+  transition: none;
+}
+.btn-next-step:hover::after, .btn-submit-app:hover::after, .btn-dashboard:hover::after {
+  left: 160%;
+  transition: all 0.7s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* Form fields glowing transition */
+.form-control, .form-select {
+  transition: all 0.25s ease;
+}
+.form-control:focus, .form-select:focus {
+  border-color: var(--gold-light);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.12);
+}
+
