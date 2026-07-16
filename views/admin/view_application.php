@@ -263,6 +263,11 @@
                       onclick="adminUpdateStatus(<?= $application['id'] ?>)">
                 <i class="fas fa-save me-2"></i> Update Status
               </button>
+
+              <a href="https://api.whatsapp.com/send?phone=<?= urlencode(preg_replace('/[^\d]/', '', $application['mobile'])) ?>&text=<?= urlencode("Hello " . $application['full_name'] . ",\n\nWe are updating you regarding your Study Visa Application (" . $application['application_id'] . "). Currently, the status is: *" . $application['status'] . "*.\n\nRegards,\nVisa Vista Global Support") ?>"
+                 target="_blank" class="btn-save-draft w-100 mt-2 text-center justify-content-center" style="border-color:#25D366; color:#128C7E; text-decoration:none;">
+                <i class="fab fa-whatsapp me-2" style="color:#25D366; font-size:16px;"></i> Send WhatsApp Chat
+              </a>
             </div>
           </div>
         </div>

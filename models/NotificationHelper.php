@@ -144,4 +144,137 @@ class NotificationHelper
 
         return $smtpSuccess || !$fallbackUsed;
     }
+
+    /**
+     * Sends a WhatsApp notification to the applicant via chosen gateway (or logs locally).
+     */
+    public static function sendWhatsAppMessage(array $app, string $newStatus, string $notes = ''): bool
+    {
+        if (!defined('WHATSAPP_ENABLED') || !WHATSAPP_ENABLED) {
+            return false;
+        }
+
+        $phone = trim($app['mobile'] ?? '');
+        $name  = $app['full_name'] ?? 'Applicant';
+        $appId = $app['application_id'] ?? '';
+
+        if (empty($phone)) {
+            return false;
+        }
+
+        // Clean phone number: remove non-numeric characters except +
+        $cleanedPhone = preg_replace('/[^\d+]/', '', $phone);
+        // Ensure it has a country prefix, e.g., if no +, prefix with country code if needed (defaulting to + or keeping as is)
+        if (substr($cleanedPhone, 0, 1) !== '+') {
+            $cleanedPhone = '+' . $cleanedPhone; // Standard Twilio prefix formatting
+        }
+
+        // Construct message
+        $message  = "Dear {$name},\n\n";
+        $message .= "Your Study Visa Application status has been updated. Details:\n\n";
+        $message .= "📂 Application ID: {$appId}\n";
+        $message .= "📍 Current Status: {$newStatus}\n";
+        if (!empty($notes)) {
+            $message .= "📝 Consultant Remarks: {$notes}\n";
+        }
+        $message .= "\nTo view details, visit: http://localhost/visa_portal/\n\n";
+        $message .= "— Visa Vista Global Support";
+
+        $provider = defined('WHATSAPP_PROVIDER') ? WHATSAPP_PROVIDER : 'log';
+        $success = false;
+        $debugInfo = '';
+
+        switch ($provider) {
+            case 'twilio':
+                if (!empty(TWILIO_ACCOUNT_SID) && !empty(TWILIO_AUTH_TOKEN)) {
+                    $url = "https://api.twilio.com/2010-04-01/Accounts/" . TWILIO_ACCOUNT_SID . "/Messages.json";
+                    $data = [
+                        'From' => TWILIO_FROM_NUMBER,
+                        'To'   => 'whatsapp:' . $cleanedPhone,
+                        'Body' => $message
+                    ];
+
+                    $ch = curl_init($url);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($ch, CURLOPT_POST, true);
+                    curl_setopt($ch, CURLOPT_USERPWD, TWILIO_ACCOUNT_SID . ":" . TWILIO_AUTH_TOKEN);
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+                    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                    
+                    $response = curl_exec($ch);
+                    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                    
+                    if (curl_errno($ch)) {
+                        $debugInfo = "Twilio Curl Error: " . curl_error($ch);
+                    } else {
+                        $debugInfo = "Twilio HTTP Code: {$httpCode}, Response: {$response}";
+                        $success = ($httpCode >= 200 && $httpCode < 300);
+                    }
+                    curl_close($ch);
+                } else {
+                    $debugInfo = "Twilio credentials not configured.";
+                }
+                break;
+
+            case 'ultramsg':
+                if (!empty(ULTRAMSG_INSTANCE_ID) && !empty(ULTRAMSG_TOKEN)) {
+                    $url = "https://api.ultramsg.com/" . ULTRAMSG_INSTANCE_ID . "/messages/chat";
+                    $data = [
+                        'token' => ULTRAMSG_TOKEN,
+                        'to'    => $cleanedPhone,
+                        'body'  => $message,
+                        'priority' => 10
+                    ];
+
+                    $ch = curl_init($url);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($ch, CURLOPT_POST, true);
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+                    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                    
+                    $response = curl_exec($ch);
+                    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                    
+                    if (curl_errno($ch)) {
+                        $debugInfo = "Ultramsg Curl Error: " . curl_error($ch);
+                    } else {
+                        $debugInfo = "Ultramsg HTTP Code: {$httpCode}, Response: {$response}";
+                        $success = ($httpCode >= 200 && $httpCode < 300);
+                    }
+                    curl_close($ch);
+                } else {
+                    $debugInfo = "Ultramsg credentials not configured.";
+                }
+                break;
+
+            case 'log':
+            default:
+                $success = true;
+                $debugInfo = "Logged to local mock file.";
+                break;
+        }
+
+        // Local logs for testing/inspection on XAMPP
+        $logDir = BASE_PATH . DIRECTORY_SEPARATOR . 'uploads';
+        if (!is_dir($logDir)) {
+            mkdir($logDir, 0755, true);
+        }
+        $logFile = $logDir . DIRECTORY_SEPARATOR . 'whatsapp_log.txt';
+
+        $timestamp = date('Y-m-d H:i:s');
+        $divider = str_repeat('=', 80);
+        
+        $logPayload = "{$divider}\n";
+        $logPayload .= "Timestamp: {$timestamp}\n";
+        $logPayload .= "Recipient Phone: {$cleanedPhone} ({$name})\n";
+        $logPayload .= "Provider: {$provider}\n";
+        $logPayload .= "Status: " . ($success ? "SUCCESS" : "FAILED") . "\n";
+        $logPayload .= "Gateway Debug: {$debugInfo}\n";
+        $logPayload .= "Message Content:\n-------------------------------\n{$message}\n-------------------------------\n";
+        $logPayload .= "{$divider}\n\n";
+
+        file_put_contents($logFile, $logPayload, FILE_APPEND | LOCK_EX);
+
+        return $success;
+    }
 }

@@ -288,6 +288,7 @@ class ApplicationModel
 
             // Trigger email/message notification to applicant
             NotificationHelper::sendStatusEmail($old, $status, $notes);
+            NotificationHelper::sendWhatsAppMessage($old, $status, $notes);
         }
 
         return true;

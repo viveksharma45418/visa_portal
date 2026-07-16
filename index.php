@@ -28,6 +28,7 @@ session_start();
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/config/auth.php';
 require_once __DIR__ . '/config/mail.php';
+require_once __DIR__ . '/config/whatsapp.php';
 require_once __DIR__ . '/models/ApplicationModel.php';
 require_once __DIR__ . '/models/SmtpMailer.php';
 require_once __DIR__ . '/models/NotificationHelper.php';
